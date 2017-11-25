@@ -1375,6 +1375,8 @@ class Player(Repeatable):
             freq   = miditofreq(midinote)
 
             message.update({'freq':  freq, 'midinote': midinote})
+            if isinstance(degree, rest):
+                message['amp'] = 0
 
         return message
 
