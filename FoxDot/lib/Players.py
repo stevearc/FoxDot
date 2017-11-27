@@ -355,6 +355,8 @@ class Player(Repeatable):
         """
 
         if isinstance(other, SynthDefProxy):
+            self.reset()
+
             # Call the update method
             self.update(other.name, other.degree, **other.kwargs)
 
