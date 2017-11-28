@@ -73,3 +73,7 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.scsyndef
+.env
+venv
+.ropeproject
