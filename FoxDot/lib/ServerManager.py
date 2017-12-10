@@ -25,6 +25,9 @@ else:
     from .OSC import *
 
 
+BUFFER_LOCK = threading.Lock()
+
+
 # Keep in sync with Info.scd
 ServerInfo = namedtuple(
     'ServerInfo',
@@ -32,6 +35,9 @@ ServerInfo = namedtuple(
      'num_audio_bus_channels', 'num_control_bus_channels',
      'num_input_bus_channels', 'num_output_bus_channels', 'num_buffers',
      'max_nodes', 'max_synth_defs'))
+
+BufferInfo = namedtuple('BufferInfo',
+                        ('bufnum', 'frames', 'channels', 'samplerate'))
 
 
 class SCLangClient(OSCClient):
@@ -66,7 +72,9 @@ class SCLangBidirectionalClient(OSCServer):
         self._server_thread = None
         self.addDefaultHandlers()
         self.addMsgHandler('default', self._handle_message)
+        self.addMsgHandler('done', self._on_done)
         self._response_queue = queue.Queue()
+        self._done_handlers = {}
 
     def connect(self, addr):
         """ Connect to an address and start the server thread """
@@ -89,8 +97,17 @@ class SCLangBidirectionalClient(OSCServer):
         self._server_thread.join()
         self.server_close()
 
+    def addDoneHandler(self, command, callback):
+        command = '/' + command.strip('/')
+        self._done_handlers[command] = callback
+
     def _handle_message(self, addr, tags, data, client_address):
         self._response_queue.put((addr, data))
+
+    def _on_done(self, addr, tags, data, client_addr):
+        command = data[0]
+        if command in self._done_handlers:
+            self._done_handlers[command](addr, tags, data, client_addr)
 
     def send(self, *args, **kwargs):
         try:
@@ -154,7 +171,9 @@ class SCLangServerManager(ServerManager):
         self.count = 0
 
         # General SuperCollider OSC connection
-        self.client = SCLangClient()
+        self.client = SCLangBidirectionalClient()
+        self.client.addMsgHandler('b_info', self._on_buffer_info)
+        self.client.addDoneHandler('b_allocRead', self._on_buffer_alloc)
         self.client.connect( (self.addr, self.port) )
 
         # Assign a valid OSC Client
@@ -166,6 +185,7 @@ class SCLangServerManager(ServerManager):
         self.bus = self.num_input_busses + self.num_output_busses
         self.max_busses = 100
         self.max_buffers = 1024
+        self._buffer_info = {}
 
         self.fx_setup_done = False
         self.fx_names = {}
@@ -625,6 +645,22 @@ class SCLangServerManager(ServerManager):
             sleep(1)
             self.daemon.terminate()
         return
+
+    def _on_buffer_alloc(self, addr, tags, data, client_addr):
+        bufnum = data[1]
+        msg = OSCMessage()
+        msg.setAddress('/b_query')
+        msg.append(bufnum)
+        self.client.send(msg)
+
+    def _on_buffer_info(self, addr, tags, data, client_addr):
+        info = BufferInfo(*data)
+        with BUFFER_LOCK:
+            self._buffer_info[info.bufnum] = info
+
+    def getBufferInfo(self, bufnum):
+        with BUFFER_LOCK:
+            return self._buffer_info.get(bufnum)
 
 try:
     import socketserver
