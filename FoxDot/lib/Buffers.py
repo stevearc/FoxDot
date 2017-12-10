@@ -360,6 +360,7 @@ class LoopSynthDef(SampleSynthDef):
     def __init__(self):
         SampleSynthDef.__init__(self, "loop")
         self.sample = self.new_attr_instance("sample")
+        self.stretch = self.new_attr_instance("stretch")
         self.defaults['sample']   = 0
 
     def __call__(self, filename, pos=0, sample=0, **kwargs):

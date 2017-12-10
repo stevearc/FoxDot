@@ -165,11 +165,21 @@ s1 >> loop('foxdot')
 ```
 
 You may notice that this is just playing the first part of the sample over and
-over again. You can tweak the behavior with many of the arguments we've seen
-thus far for controlling other synths. `dur` is a good place to start.
+over again. Changing the `dur` is a good start.
 
 ```python
 s1 >> loop('foxdot', dur=4)
+```
+
+Samples won't always perfectly line up to the duration you specify, which can be
+an issue if it's supposed to be a continuous loop. For this, you should use the
+`stretch` argument, which will scale the playback rate of the sample to fit the
+dur.
+
+```python
+s1 >> loop('amen break', dur=4, stretch=4)
+# Or to link the two values together
+s1 >> loop('amen break', dur=4, stretch=s1.dur)
 ```
 
 If you have a folder full of samples that you would like to use in FoxDot, you

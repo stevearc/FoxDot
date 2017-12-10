@@ -1338,6 +1338,7 @@ class Player(Repeatable):
             fin = group_modi(kwargs.get("fin", self.event["fin"]), index)
             rate = group_modi(kwargs.get("rate", self.event["rate"]), index)
             sus = group_modi(kwargs.get("sus", self.event["sus"]), index)
+            stretch = group_modi(kwargs.get("stretch", self.event.get("stretch", 0)), index)
 
             sus = self.case_modulation['sus'](sus, index, **kwargs)
             if rate == 0:
@@ -1358,9 +1359,25 @@ class Player(Repeatable):
                     rate *= -1
 
             # Adjust the rate to a given tempo
-
             rate = tempo * rate
 
+            if stretch > 0:
+                info = self.metro.server.getBufferInfo(buf)
+                if info is None:
+                    duration = 1
+                else:
+                    duration = info.frames / info.samplerate
+                stretch_dur = self.metro.beat_dur(stretch)
+                if fin >= 0:
+                    start, end = min(pos, fin), max(pos, fin)
+                    duration -= (duration - end)
+                    duration -= start
+                elif pos > 0:
+                    duration -= pos
+
+                rate = rate * duration / stretch_dur
+
+            # If the rate is negative, we should flip the start and end
             if rate < 0:
                 pos += abs(rate) * sus
 
