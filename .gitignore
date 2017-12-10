@@ -11,6 +11,7 @@ FoxDot/lib/Custom/*
 FoxDot/lib/GhostCoder/*
 FoxDot/lib/Settings/conf.txt
 FoxDot/lib/Workspace/tmp/tempfile.txt
+FoxDot/kits
 changed_files.txt
 
 *.txt

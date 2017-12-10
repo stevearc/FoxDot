@@ -47,6 +47,7 @@ FOXDOT_ROOT  = os.path.realpath(__file__ + "/../../../")
 FOXDOT_ICON  = os.path.realpath(FOXDOT_ROOT + "/lib/Workspace/img/icon" + (".ico" if SYSTEM != LINUX else ".gif"))
 FOXDOT_SND   = os.path.realpath(FOXDOT_ROOT + "/snd/")
 FOXDOT_LOOP  = os.path.realpath(FOXDOT_ROOT + "/snd/_loop_/")
+FOXDOT_KITS  = os.path.realpath(FOXDOT_ROOT + "/kits/")
 
 SCLANG_EXEC   = 'sclang.exe' if SYSTEM == WINDOWS else 'sclang'
 SYNTHDEF_DIR  = os.path.realpath(FOXDOT_ROOT + "/osc/scsyndef/")

@@ -14,8 +14,10 @@ that can be proggrammed into performance.
 """
 from __future__ import absolute_import, division, print_function
 
+import csv
 import fnmatch
 import os
+from collections import OrderedDict
 from contextlib import closing
 from itertools import chain
 from os.path import abspath, join, isabs, isfile, isdir, splitext
@@ -24,7 +26,7 @@ from .Code import WarningMsg
 from .Logging import Timing
 from .SCLang import SampleSynthDef
 from .ServerManager import DefaultServer
-from .Settings import FOXDOT_SND, FOXDOT_LOOP
+from .Settings import FOXDOT_SND, FOXDOT_LOOP, FOXDOT_KITS
 
 
 alpha    = "abcdefghijklmnopqrstuvwxyz"
@@ -93,6 +95,109 @@ DESCRIPTIONS = { 'a' : "Gameboy hihat", 'A' : "Sword",
                  '4' : 'Vocals (Four)'}
 
 
+class SampleDef(object):
+    def __init__(self, filename, pos=0, fin=-1, rate=1, amp=1):
+        self.filename = filename
+        self.pos = float(pos)
+        self.fin = float(fin)
+        self.rate = float(rate)
+        self.amp = float(amp)
+
+    def asdict(self):
+        return OrderedDict([
+            ('filename', self.filename),
+            ('pos', self.pos),
+            ('fin', self.fin),
+            ('rate', self.rate),
+            ('amp', self.amp),
+        ])
+
+
+class Sample(object):
+    def __init__(self, filename, bufnum, pos=0, fin=-1, rate=1, amp=1):
+        self.filename = filename
+        self.bufnum = bufnum
+        self.pos = pos
+        self.fin = fin
+        self.rate = rate
+        self.amp = amp
+
+    @classmethod
+    def fromDef(cls, sampleDef, bufferManager):
+        bufnum = bufferManager._allocateAndLoad(sampleDef.filename)
+        return cls(bufnum=bufnum, **sampleDef.asdict())
+
+nil = Sample('', 0)
+
+
+class SymbolMap(object):
+    def __init__(self):
+        self._symbols = {}
+
+    def __str__(self):
+        lines = ['<SymbolMap>']
+        for symbol, samples in sorted(self._symbols.items()):
+            for sample in samples:
+                lines.append(symbol + ' ' + sample.filename)
+        return '\n'.join(lines)
+
+    def __delitem__(self, key):
+        self._symbols.pop(key, None)
+
+    def pop(self, key, index=-1):
+        if self._symbols.get(key):
+            self._symbols[key].pop(index)
+
+    def add(self, symbol, sampleDef):
+        samples = self._symbols.setdefault(symbol, [])
+        samples.append(sampleDef)
+
+    def get(self, key, index=0):
+        samples = self._symbols.get(key, None)
+        if not samples:
+            return None
+        return samples[index % len(samples)]
+
+    def clear(self):
+        self._symbols.clear()
+
+    def save(self, name, dirname=FOXDOT_KITS):
+        if not isdir(dirname):
+            os.mkdir(dirname)
+        with open(join(dirname, name + '.csv'), 'wb') as ofile:
+            filenames = ('symbol',) + tuple(SampleDef.asdict().keys())
+            writer = csv.DictWriter(ofile, fieldnames=fieldnames)
+            writer.writeheader()
+            for symbol, samples in self._symbols.items():
+                for sample in samples:
+                    row = sample._asdict()
+                    row['symbol'] = symbol
+                    writer.writerow(row)
+
+    def load(self, name):
+        self.clear()
+        if not isabs(name):
+            name = join(FOXDOT_KITS, name + '.csv')
+
+        with open(name, 'rb') as ifile:
+            reader = csv.DictReader(ifile)
+            for row in reader:
+                symbol = row.pop('symbol')
+                sampleDef = SampleDef(**row)
+                samples = self._symbols.setdefault(symbol, [])
+                samples.append(sampleDef)
+
+    def kits(self):
+        if isdir(FOXDOT_KITS):
+            return [splitext(k)[0] for k in os.listdir(FOXDOT_KITS)]
+        return []
+
+    def delKit(self, name):
+        fullpath = join(FOXDOT_KITS, name + '.csv')
+        if isfile(fullpath):
+            os.unlink(fullpath)
+
+
 def symbolToDir(symbol):
     """ Return the sample search directory for a symbol """
     if symbol.isalpha():
@@ -118,6 +223,7 @@ class BufferManager(object):
         self._fn_to_buf = {}
         self._paths = [FOXDOT_LOOP] + list(paths)
         self._ext = ['wav', 'wave', 'aif', 'aiff', 'flac']
+        self.kit = SymbolMap()
 
     def __str__(self):
         return "\n".join(["%r: %s" % (k, v) for k, v in sorted(DESCRIPTIONS.items())])
@@ -172,17 +278,27 @@ class BufferManager(object):
         self._max_buffers = max_buffers
         self._nextbuf = self._nextbuf % max_buffers
 
-    def getBufferFromSymbol(self, symbol, index=0):
-        """ Get buffer information from a symbol """
+    def addSample(self, symbol, filename, index=0, **kwargs):
+        samplepath = self._findSample(filename, index)
+        if samplepath is not None:
+            sampleDef = SampleDef(samplepath, **kwargs)
+            self.kit.add(symbol, sampleDef)
+
+    def getSampleFromSymbol(self, symbol, index=0):
+        """ Get a Sample from a symbol """
         if symbol.isspace():
-            return 0
+            return nil
+        sampleDef = self.kit.get(symbol, index)
+        if sampleDef is not None:
+            return Sample.fromDef(sampleDef, self)
         dirname = symbolToDir(symbol)
         if dirname is None:
-            return 0
+            return nil
         samplepath = self._findSample(dirname, index)
         if samplepath is None:
-            return 0
-        return self._allocateAndLoad(samplepath)
+            return nil
+        bufnum = self._allocateAndLoad(samplepath)
+        return Sample(samplepath, bufnum)
 
     def getBufferInfo(self, bufnum):
         """ Proxy to fetch buffer info from server """
@@ -199,8 +315,7 @@ class BufferManager(object):
 
     def _getSoundFile(self, filename):
         """ Look for a file with all possible extensions """
-        base, cur_ext = splitext(filename)
-        if cur_ext:
+        if hasext(filename):
             # If the filename already has an extensions, keep it
             if isfile(filename):
                 return filename

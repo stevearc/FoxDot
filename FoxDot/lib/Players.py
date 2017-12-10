@@ -1309,17 +1309,26 @@ class Player(Repeatable):
         if self.synthdef == SamplePlayer:
 
             degree = group_modi(kwargs.get("degree", self.event['degree']), index)
-            sample = group_modi(kwargs.get("sample", self.event["sample"]), index)
+            index  = group_modi(kwargs.get("sample", self.event["sample"]), index)
+            sample = self.samples.getSampleFromSymbol(str(degree), index)
             rate   = group_modi(kwargs.get("rate", self.event["rate"]), index)
             pos    = group_modi(kwargs.get("pos", self.event.get("pos", 0)), index)
             fin    = group_modi(kwargs.get("fin", self.event["fin"]), index)
             sus    = group_modi(kwargs.get("sus", self.event["sus"]), index)
-
             sus = self.case_modulation['sus'](sus, index, **kwargs)
+            amp    = group_modi(kwargs.get("amp", self.event["amp"]), index)
+            amp = self.case_modulation['amp'](amp, index, **kwargs)
+
             if rate == 0:
                 rate = 1
+            rate *= sample.rate
+            amp *= sample.amp
+            if fin < 0 and sample.fin >= 0:
+                fin = sample.fin
+            pos += sample.pos
 
             if fin >= 0:
+                fin += sample.pos
                 sus = abs(fin - pos)
                 if fin < pos:
                     rate *= -1
@@ -1327,9 +1336,8 @@ class Player(Repeatable):
             if rate < 0:
                 pos += abs(rate) * sus
 
-            buf  = self.samples.getBufferFromSymbol(str(degree), sample)
-
-            message = {'buf': buf, 'pos': pos, 'sus': sus, 'rate': rate}
+            message = {'buf': sample.bufnum, 'pos': pos, 'sus': sus,
+                       'rate': rate, 'amp': amp}
 
         elif self.synthdef == LoopPlayer:
 
