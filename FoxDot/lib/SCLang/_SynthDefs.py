@@ -10,10 +10,12 @@ from . import Env
 
 with SampleSynthDef("play1") as play:
     play.osc  = PlayBuf.ar(1, play.buf, BufRateScale.ir(play.buf) * play.rate, startPos=BufSampleRate.kr(play.buf) * play.pos)
+    play.osc = play.osc * Env.env([0.05, play.sus-0.05, 0.05], [1,1])
     play.osc  = play.osc * play.amp
 
 with SampleSynthDef("play2") as play:
     play.osc  = PlayBuf.ar(2, play.buf, BufRateScale.ir(play.buf) * play.rate, startPos=BufSampleRate.kr(play.buf) * play.pos)
+    play.osc = play.osc * Env.env([0.05, play.sus-0.05, 0.05], [1,1])
     play.osc  = play.osc * play.amp
 
 # Synth Players

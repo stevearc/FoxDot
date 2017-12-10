@@ -512,7 +512,7 @@ class Player(Repeatable):
         for key in Player.Attributes():
 
             if key not in ("scale", "dur", "sus", "blur", "amp",
-                            "amplify", "degree", "oct", "bpm"):
+                            "amplify", "degree", "oct", "bpm", "fin"):
 
                 setattr(self, key, 0)
 
@@ -560,6 +560,9 @@ class Player(Repeatable):
 
         # Tempo
         self.bpm     = None
+
+        # Finish position for samples
+        self.fin     = -1
 
         return self
 
@@ -1308,61 +1311,60 @@ class Player(Repeatable):
             degree = group_modi(kwargs.get("degree", self.event['degree']), index)
             sample = group_modi(kwargs.get("sample", self.event["sample"]), index)
             rate   = group_modi(kwargs.get("rate", self.event["rate"]), index)
+            pos    = group_modi(kwargs.get("pos", self.event.get("pos", 0)), index)
+            fin    = group_modi(kwargs.get("fin", self.event["fin"]), index)
+            sus    = group_modi(kwargs.get("sus", self.event["sus"]), index)
+
+            sus = self.case_modulation['sus'](sus, index, **kwargs)
+            if rate == 0:
+                rate = 1
+
+            if fin >= 0:
+                sus = abs(fin - pos)
+                if fin < pos:
+                    rate *= -1
 
             if rate < 0:
-
-                sus = group_modi(kwargs.get("sus", self.event["sus"]), index)
-
-                pos = self.metro.beat_dur(sus)
-
-            else:
-
-                pos = 0
+                pos += abs(rate) * sus
 
             buf  = self.samples.getBufferFromSymbol(str(degree), sample).bufnum
 
-            message = {'buf': buf, 'pos': pos}
+            message = {'buf': buf, 'pos': pos, 'sus': sus, 'rate': rate}
 
         elif self.synthdef == LoopPlayer:
 
             pos = group_modi(kwargs.get("degree", self.event["degree"]), index)
             buf = group_modi(kwargs.get("buf", self.event["buf"]), index)
+            fin = group_modi(kwargs.get("fin", self.event["fin"]), index)
+            rate = group_modi(kwargs.get("rate", self.event["rate"]), index)
+            sus = group_modi(kwargs.get("sus", self.event["sus"]), index)
+
+            sus = self.case_modulation['sus'](sus, index, **kwargs)
+            if rate == 0:
+                rate = 1
 
             # Get a user-specified tempo
 
             given_tempo = group_modi(kwargs.get("tempo", self.event.get("tempo", self.metro.bpm)), index)
 
             if given_tempo is None:
-
                 tempo = 1
-
             else:
-
                 tempo = self.metro.bpm / given_tempo
 
-            # Set the position in "beats"
-
-            pos = pos * tempo * self.metro.beat_dur(1)
-
-            # If there is a negative rate, move the pos forward
-
-            rate = group_modi(kwargs.get("rate", self.event["rate"]), index)
-
-            if rate == 0:
-
-                rate = 1
+            if fin >= 0:
+                sus = abs(fin - pos)
+                if fin < pos:
+                    rate *= -1
 
             # Adjust the rate to a given tempo
 
             rate = tempo * rate
 
             if rate < 0:
+                pos += abs(rate) * sus
 
-                sus = group_modi(kwargs.get("sus", self.event["sus"]), index)
-
-                pos += self.metro.beat_dur(sus)
-
-            message = {'pos': pos, 'buf': buf, 'rate': rate}
+            message = {'pos': pos, 'buf': buf, 'sus': sus, 'rate': rate}
 
         else:
 

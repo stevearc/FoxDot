@@ -3,6 +3,7 @@ SynthDef.new(\play2,
 var osc, env;
 rate = In.kr(bus, 1);
 osc=PlayBuf.ar(2, buf, (BufRateScale.ir(buf) * rate), startPos: (BufSampleRate.kr(buf) * pos));
+osc=(osc * EnvGen.ar(Env(levels: [0, 1, 1, 0],curve: 'lin',times: [0.05, (sus - 0.05), 0.05]), doneAction: 0));
 osc=(osc * amp);
 osc = Mix(osc) * 0.5;
 osc = Pan2.ar(osc, pan);
