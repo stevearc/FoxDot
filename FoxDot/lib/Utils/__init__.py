@@ -133,3 +133,48 @@ class dots:
     """ Class for representing long Patterns in strings """
     def __repr__(self):
         return '...'
+
+
+def processSample(server, clock, buf, pos=0, fin=-1, sus=0, stretch=0, rate=1, tempo=1):
+
+    # Adjust the rate to a given tempo
+    rate = tempo * rate
+
+    # Fetch info and calculate duration
+    info = server.getBufferInfo(buf)
+    if info is None:
+        duration = 1
+    else:
+        duration = info.frames / info.samplerate
+
+    # Adjust the duration for the pos and fin
+    if fin >= 0:
+        start, end = min(pos, fin), max(pos, fin)
+        duration -= (duration - end)
+        duration -= start
+        sus = abs(duration / rate)
+    elif pos > 0:
+        fin = duration
+        duration -= pos
+
+    # Adjust the rate for stretch
+    if stretch > 0:
+        stretch_dur = clock.beat_dur(stretch)
+        rate = rate * duration / stretch_dur
+
+    # Set the sus if not specified
+    if sus == 0:
+        sus = abs(duration / rate)
+
+    # If fin < pos flip the rate again
+    new_rate = rate
+    if fin >= 0 and fin < pos:
+        new_rate *= -1
+
+    # If playing backwards, move pos forward
+    if rate < 0:
+        pos = fin
+
+    rate = new_rate
+
+    return {'pos': pos, 'buf': buf, 'sus': sus, 'rate': rate}

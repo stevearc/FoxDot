@@ -37,6 +37,7 @@ from .ServerManager import *
 from .SCLang import SynthDefs, Env, SynthDef, CompiledSynthDef
 from .Root import Root
 from .Scale import Scale
+from .Utils import processSample
 from .Workspace import get_keywords
 
 # stdlib imports
@@ -100,7 +101,7 @@ def update_foxdot_clock(clock):
 
     assert isinstance(clock, TempoClock)
 
-    for item in (TimeVar, Player, MidiIn):
+    for item in (TimeVar, Player, MidiIn, Trigger):
 
         item.set_clock(clock)
 
@@ -113,6 +114,7 @@ def update_foxdot_server(serv):
 
     TempoClock.set_server(serv)
     SynthDefs.set_server(serv)
+    Trigger.set_server(serv)
 
     return
 
@@ -136,6 +138,73 @@ def instantiate_player_objects():
         FoxDotCode.namespace[char1 + "_all"] = Group(*[FoxDotCode.namespace[char1+str(n)] for n in range(10)])
 
     return
+
+
+class Trigger(object):
+    """
+    Triggers a sample to play once
+
+    :param quant: Quantize the trigger on this beat
+
+    """
+    server = None
+    clock = None
+    queue_block = None
+
+    def __init__(self, filename, sample=0, pos=0, fin=-1, dur=0, stretch=0,
+                 rate=1, amp=1, delay=0, quant=1):
+        now = Clock.now()
+        if quant == 0:
+            # Can't run immediately; the buffer might need to load.
+            next_run = now + .01
+        else:
+            next_run = now + quant - now % quant
+        Clock.schedule(self, next_run + delay)
+
+        if len(filename) == 1:
+            sample = Samples.getSampleFromSymbol(filename, sample)
+            self.buf = sample.bufnum
+        else:
+            self.buf = Samples.loadBuffer(filename, sample)
+        self.pos = pos
+        self.fin = fin
+        if dur > 0:
+            self.dur = clock.beat_dur(dur)
+        else:
+            self.dur = dur
+        self.stretch = stretch
+        self.rate = rate
+        self.amp = amp
+
+    @classmethod
+    def set_server(cls, server):
+        cls.server = server
+
+    @classmethod
+    def set_clock(cls, clock):
+        cls.clock = clock
+
+    @classmethod
+    def set_queue_block(cls, queue_block):
+        cls.queue_block = queue_block
+
+    def __call__(self):
+        message = processSample(self.server, self.clock, self.buf, self.pos,
+                                self.fin, self.dur, self.stretch, self.rate)
+        message['amp'] = self.amp
+        info = self.server.getBufferInfo(self.buf)
+        if info is None:
+            synthdef = 'play1'
+        else:
+            synthdef = 'play1' if info.channels == 1 else 'play2'
+
+        # No fx for now
+        effects = {}
+        bundle = self.server.get_bundle(synthdef, message, effects)
+        self.queue_block.osc_messages.append(bundle)
+
+trigger = Trigger
+
 
 def Master():
     """ Returns a `Group` containing all the players currently active in the Clock """

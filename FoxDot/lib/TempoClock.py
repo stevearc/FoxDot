@@ -567,7 +567,7 @@ class Queue(object):
 
         # Tell any players about what queue item they are in
 
-        if isinstance(item, Player):
+        if hasattr(item, 'set_queue_block'):
 
             item.set_queue_block(block)
 

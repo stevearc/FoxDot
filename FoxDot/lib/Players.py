@@ -152,7 +152,7 @@ from .Settings import SamplePlayer, LoopPlayer
 from .Code import WarningMsg, debug_stdout
 from .SCLang.SynthDef import SynthDefProxy, SynthDef, SynthDefs
 from .Effects import FxList
-from .Utils import stdout
+from .Utils import stdout, processSample
 from .Buffers import Samples
 
 from .Key import *
@@ -1353,35 +1353,8 @@ class Player(Repeatable):
             else:
                 tempo = self.metro.bpm / given_tempo
 
-            if fin >= 0:
-                sus = abs(fin - pos)
-                if fin < pos:
-                    rate *= -1
-
-            # Adjust the rate to a given tempo
-            rate = tempo * rate
-
-            if stretch > 0:
-                info = self.metro.server.getBufferInfo(buf)
-                if info is None:
-                    duration = 1
-                else:
-                    duration = info.frames / info.samplerate
-                stretch_dur = self.metro.beat_dur(stretch)
-                if fin >= 0:
-                    start, end = min(pos, fin), max(pos, fin)
-                    duration -= (duration - end)
-                    duration -= start
-                elif pos > 0:
-                    duration -= pos
-
-                rate = rate * duration / stretch_dur
-
-            # If the rate is negative, we should flip the start and end
-            if rate < 0:
-                pos += abs(rate) * sus
-
-            message = {'pos': pos, 'buf': buf, 'sus': sus, 'rate': rate}
+            message = processSample(self.metro.server, self.metro, buf, pos,
+                                    fin, sus, stretch, rate, tempo)
 
         else:
 

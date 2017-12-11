@@ -158,14 +158,16 @@ george >> pluck(PTri(5), scale=Scale.default.pentatonic)
 
 ## 5. Samples
 
-You saw earlier how to work with samples using `play()`. You can also play samples with `loop()`.
+You saw earlier how to work with samples using `play()`. You can also play
+samples with `trigger()` and `loop()`.
 
 ```python
-s1 >> loop('foxdot')
+trigger('foxdot')    # Plays the sample once
+s1 >> loop('foxdot') # Loops the sample
 ```
 
-You may notice that this is just playing the first part of the sample over and
-over again. Changing the `dur` is a good start.
+You may notice that `loop()` is just playing the first part of the sample over
+and over again. Changing the `dur` is a good start.
 
 ```python
 s1 >> loop('foxdot', dur=4)
