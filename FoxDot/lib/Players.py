@@ -1584,7 +1584,7 @@ class Player(Repeatable):
         """ Returns the real SynthDef name of the player. Useful only for "play"
             as there is a play1 and play2 SynthDef for playing audio files with
             one or two channels respectively. """
-        if self.synthdef == SamplePlayer:
+        if self.synthdef == SamplePlayer or self.synthdef == LoopPlayer:
             numChannels = self.samples.getBuffer(buf).channels
             if numChannels == 1:
                 synthdef = "play1"
