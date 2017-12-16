@@ -57,7 +57,7 @@ class ScalePattern(Pattern):
             return pitch.__class__([self.note_to_semitone(p) for p in pitch])
         else:
             i = pitch % len(self.data)
-            n = (pitch // len(self.data)) * self.steps 
+            n = (pitch // len(self.data)) * self.steps
         return asStream(self.data)[i] + n
 
     #def semitone_to_note(self, semitone):

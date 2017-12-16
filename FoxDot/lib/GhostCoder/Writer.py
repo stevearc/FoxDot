@@ -35,7 +35,7 @@ class Ghost:
         new = Grammar.createPlayer(**syntax)
 
         self.instructions.put((original, new))
-        
+
         return
 
     def write(self):
@@ -56,9 +56,9 @@ class Ghost:
                      break
 
             else:
-                
+
                  raise Queue.Empty()
-                
+
             # 2. Replace
 
             self.widget.replace(line, old, new)
@@ -78,15 +78,15 @@ class Ghost:
             if self.running == True:
 
                 self.widget.root.after(choice([2000, 3000, 4000, 5000]), self.act)
-            
+
         return
-        
+
 
     def getPlayer(self):
         ''' Choose a player from those available '''
 
         # Read the text from the current widget
-        
+
         text = self.widget.read()
 
         # Find all the players

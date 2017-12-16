@@ -310,7 +310,7 @@ class TimeVar:
     # Mathmetical operators
 
     def math_op(self, other, op):
-        """ Performs the mathematical operation between self and other. "op" should 
+        """ Performs the mathematical operation between self and other. "op" should
             be the  string name of a dunder method  e.g. __mul__ """
         if not isinstance(other, (TimeVar, int, float)):
             if type(other) is tuple:
@@ -531,8 +531,8 @@ class Pvar(TimeVar, Pattern):
 
     def __getattribute__(self, attr):
         # If it's a method, only return the method if its new, transform, or a dunder
-        if attr in Pattern.get_methods():   
-            
+        if attr in Pattern.get_methods():
+
             if attr not in ("new", "now", "transform") and not attr.startswith("__"):
 
                 # return a function that transforms the patterns of the  root Pvar
@@ -558,7 +558,7 @@ class Pvar(TimeVar, Pattern):
                         return new_item
 
                 return get_new_pvar
-                
+
         return object.__getattribute__(self, attr)
 
     def new(self, other):
@@ -710,8 +710,8 @@ class PvarGenerator(Pvar):
 
     def __getattribute__(self, attr):
         # If it's a method, only return the method if its new, transform, or a dunder
-        if attr in Pattern.get_methods():   
-            
+        if attr in Pattern.get_methods():
+
             if attr not in ("new", "now", "transform") and not attr.startswith("__"):
 
                 # return a function that transforms the patterns of the  root Pvar
@@ -739,7 +739,7 @@ class PvarGenerator(Pvar):
                         return self.func(new_pvar_gen, self.original_value)
 
                 return get_new_pvar_gen
-                
+
         return object.__getattribute__(self, attr)
 
 class PvarGeneratorEx(PvarGenerator):

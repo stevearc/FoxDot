@@ -38,7 +38,7 @@ class instance:
     def __repr__(self):
         return str(self.value)
     def __str__(self):
-        return str(self.value)    
+        return str(self.value)
     def __add__(self, other):
         return instance("(%s)" % (str(self) + " + " + str(other)))
     def __sub__(self, other):
@@ -67,7 +67,7 @@ class instance:
         return instance("(%s)" % (str(other) + " ** " + str(self)))
     def __rtruediv__(self, other):
         return self.__rdiv__(other)
-    def __mod__(self, other):    
+    def __mod__(self, other):
         return instance(str(self.value) % str(other)) if "%" in self.value else self
     def __coerce__(self, other):
         try:
@@ -85,11 +85,11 @@ class instance:
 
     def custom(self, name):
         return self.__class__(self.string().format(name))
-    
+
     def __call__(self, *args, **kwargs):
 
         for arg in set(list(self.defaults.keys()) + list(self.shortarg.keys())):
-            
+
             if arg in self.shortarg:
 
                 if self.shortarg[arg] in kwargs:
@@ -105,9 +105,9 @@ class instance:
                 kwargs[arg] = kwargs.get(arg, self.defaults[arg])
 
         value = self.string().format("({})".format(format_args(args, kwargs)))
-        
+
         return self.__class__(value)
-        
+
 
 # UGens
 

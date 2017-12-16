@@ -62,15 +62,15 @@ def arrow_zip(pat1, pat2):
 def feed(string):
     """ Used to recursively parse nested strings, returns a list object (not Pattern),
         and a boolean denoting if the list contains a nested list """
-    
+
     string = PlayString(string)
     items  = [] # The actual pattern
 
     layer_pattern = False
     contains_nest = False
-    
+
     i = 0
-    
+
     while i < len(string):
 
         char = string[i]
@@ -108,7 +108,7 @@ def feed(string):
 
             # Parse the contents of the brackets if found
             j = string.index(")", start=i+1)
-            
+
             s = string[i+1:j]
             i = j
 
@@ -145,10 +145,10 @@ def feed(string):
             items.append( braces_type(chars) )
 
             layer_pattern = False
-                
+
         # Look for a '[]'
         elif char == "[":
-            
+
             j = string.index("]", start=i+1)
             s = string[i+1:j]
             i = j

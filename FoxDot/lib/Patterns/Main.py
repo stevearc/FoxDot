@@ -22,12 +22,12 @@ def loop_pattern_func(f):
         multiple Patterns by using Patterns or TimeVars as arguments '''
     @functools.wraps(f)
     def new_function(*args):
-        
+
         # Return any functions that use TimeVars as PvarGenerators
         timevars = [arg for arg in args if isinstance(arg, Pattern.TimeVar)]
         if len(timevars) > 0:
             return Pattern.TimeVar.CreatePvarGenerator(f, *args)
-        
+
         # Loop the pattern with different values
         pat = Pattern()
         # Force pattern types if using lists/tuples
@@ -85,11 +85,11 @@ class metaPattern(object):
         # might be created during runtime
 
         if self.__class__.__name__ not in PATTERN_WEIGHTS:
-            
+
             PATTERN_WEIGHTS.insert(-1, self.__class__.__name__)
-        
+
         if type(data) is str:
-            
+
             self.fromString(data)
 
         elif type(data) is tuple:
@@ -100,16 +100,16 @@ class metaPattern(object):
         elif isinstance(data, self.__class__):
 
             self.data = data.data
-            
+
         else:
-            
+
             self.data = data
             self.make()
 
     @classmethod
     def get_methods(cls):
         return [attr for attr in dir(cls) if callable(getattr(cls, attr))]
-            
+
     def __len__(self):
         """ Returns the *expanded" length of the pattern. e.g. the following
             are identical.
@@ -122,7 +122,7 @@ class metaPattern(object):
         """
         lengths = [1] + [len(p) for p in self.data if isinstance(p, Pattern)]
         return LCM(*lengths) * len([item for item in self.data if not isinstance(item, EmptyItem)])
-    
+
     def __str__(self):
         try:
             if len(self.data) > 20:
@@ -179,9 +179,9 @@ class metaPattern(object):
         if new_data is not None:
             new.data = new_data
         return new
-    
+
     # Pattern container methods
- 
+
     def __getitem__(self, key):
         """ Calls self.getitem. Is overridden in `FoxDot.lib.TimeVar`
             for indexing with TimeVars """
@@ -205,7 +205,7 @@ class metaPattern(object):
             elif isinstance(val, GeneratorPattern) and get_generator:
                 return val
         return val
-    
+
     def __setitem__(self, key, value):
         if isinstance(key, slice):
             self.data[key] = Format(value) # TODO - make sure this works
@@ -223,7 +223,7 @@ class metaPattern(object):
 
     def setitem(self, key, value):
         self.data[key] = Format(value)
-            
+
     def __iter__(self):
         """ Returns a generator object for this Pattern """
         for i in range(len(self)):
@@ -244,13 +244,13 @@ class metaPattern(object):
             stop = (len(self.data) + start)
 
         return Pattern([self[i] for i in range(start, stop, step) ])
-            
+
     def __setslice__(self, i, j, item):
         """ Only works in Python 2 """
         self.data[i:j] = Format(item)
 
     # Integer returning
-    
+
     def count(self, item):
         """ Returns the number of occurrences of item in the Pattern"""
         return self.data.count(item)
@@ -288,7 +288,7 @@ class metaPattern(object):
 
     def __nonzero__(self):
         return self.__bool__()
-    
+
     def abs(self):
         return abs(self)
 
@@ -301,7 +301,7 @@ class metaPattern(object):
         return self.mirror()
 
     # Piping patterns together using the '|' operator
-    
+
     def __or__(self, other):
         """ Use the '|' symbol to 'pipe' Patterns into on another """
         return self.pipe(other)
@@ -316,7 +316,7 @@ class metaPattern(object):
 
     def __rand__(self, other):
         return asStream(other).zip(self)
-    
+
     #  Comparisons --> this might be a tricky one
     def __eq__(self, other):
         return PEq(self, other)
@@ -377,7 +377,7 @@ class metaPattern(object):
                 value = int(value)
             values.append(value)
         return self.__class__(values)
-        
+
     # Methods that return augmented versions of original
 
     def shuffle(self, n=1):
@@ -440,9 +440,9 @@ class metaPattern(object):
             if hasattr(value, 'mirror'):
 
                 value = value.mirror()
-            
+
             new.append(value)
-            
+
         return self.__class__(new)
 
     def stutter(self, n=2):
@@ -594,7 +594,7 @@ class metaPattern(object):
         if a < 0:
 
             a, b = 0, a
-        
+
         return self | self.mirror()[a:b]
 
     def normalise(self):
@@ -609,7 +609,7 @@ class metaPattern(object):
         for value in self:
             if value != last_val:
                 new.append(value)
-            last_val = value                
+            last_val = value
         return self.__class__(new)
 
     def add(self, other):
@@ -661,7 +661,7 @@ class metaPattern(object):
         """ Zips a pattern with a modified version of itself. Method argument
             can be a function that takes this pattern as its first argument,
             or the name of a Pattern method as a string. """
-        
+
         if callable(method):
             func = method
             args = [self.data] + list(args)
@@ -679,8 +679,8 @@ class metaPattern(object):
     def map(self, func):
         return self.__class__([(item.map(func) if isinstance(item, metaPattern) else func(item)) for item in self.data])
 
-       
-    
+
+
     def extend(self, item):
         self[len(self):] = [item]
         return self
@@ -701,7 +701,7 @@ class metaPattern(object):
         new.data = list(self.data)
         new.append(item)
         return new
-    
+
     def i_rotate(self, n=1):
         self.data = self.data[n:] + self.data[0:n]
         return self
@@ -730,19 +730,19 @@ class metaPattern(object):
 
     def startswith(self, prefix):
         return self.data[0] == prefix
-    
+
     def all(self, func=(lambda x: bool(x))):
         """ Returns true if all of the patterns contents satisfies func(x) - default is nonzero """
         if len(self.data) is 0:
             return False
-        
+
         for item in self.data:
             if not func(item):
                 return False
         return True
 
     # Extension methods
-        
+
     def pipe(self, pattern):
         """ Concatonates this patterns stream with another """
         return Pattern(self.data + asStream(pattern).data)
@@ -791,7 +791,7 @@ class metaPattern(object):
             output.append(new_item)
 
         return output
-    
+
     def deepzip(self, other):
         new = []
         other = asStream(other)
@@ -846,9 +846,9 @@ class metaPattern(object):
         if isinstance(self.data, str):
 
             self.data = list(self.data)
-            
+
         if not isinstance(self.data, PatternType): # not sure about PlayString data
-    
+
             self.data = [self.data]
 
         #: Put any data in a tuple into a PGroup
@@ -861,7 +861,7 @@ class metaPattern(object):
                 self.data[i] = Pattern(data)
 
         self.data = list(self.data)
-                
+
         return self
 
 class Pattern(metaPattern):
@@ -872,15 +872,15 @@ class PGroup(metaPattern):
     """
         Class to represent any groupings of notes as denoted by brackets.
         PGroups should only be found within a Pattern object.
-        
+
     """
-    
+
     bracket_style = "()"
 
     def __init__(self, seq=[], *args):
 
         if not args:
-            
+
             if isinstance(seq, metaPattern):
 
                 seq = seq.data
@@ -895,7 +895,7 @@ class PGroup(metaPattern):
         metaPattern.__init__(self, seq)
 
         # If the PGroup contains patterns, invert it to a Pattern of PGroups
-        
+
         l = [len(p) for p in self.data if isinstance(p, Pattern)]
 
         if len(l) > 0:
@@ -942,10 +942,10 @@ class PGroup(metaPattern):
 
     def flatten(self):
         """ Returns a nested PGroup as un-nested e.g.
-            ``` 
+            ```
                 >>> P(0,(3,5)).flatten()
                 P(0, 3, 5)
-            ``` 
+            ```
         """
         values = []
         for item in self:
@@ -1075,14 +1075,14 @@ class GeneratorPattern(random.Random):
         random.Random.__init__(self)
 
         # Set the seed if a random pattern
-        
+
         if kwargs.get("seed", None) is not None:
-            
+
             self.seed(kwargs["seed"])
 
         self.args = tuple()
         self.kwargs = kwargs
-            
+
         self.mod = Pattern()
         self.mod_functions = []
         self.name  = self.__class__.__name__
@@ -1095,7 +1095,7 @@ class GeneratorPattern(random.Random):
     def __repr__(self):
         """ String version is the name of the class and its arguments """
         return "{}({})".format(self.name, self.data)
-        
+
     def getitem(self, index=None, *args):
         """ Calls self.func(index) to get an item if index is not in
             self.history, otherwise returns self.history[index] """
@@ -1126,12 +1126,12 @@ class GeneratorPattern(random.Random):
     def func(self, index):
         return index
 
-    def __int__(self):  
+    def __int__(self):
         return int(self.getitem())
 
     def __float__(self):
         return  float(self.getitem())
-    
+
     # Arithmetic operations create new GeneratorPatterns
     def __add__(self, other):
         return self.new(other, Add)
@@ -1161,7 +1161,7 @@ class GeneratorPattern(random.Random):
     def __iter__(self):
         for i in range(self.MAX_SIZE):
             yield self[i]
-            
+
     def __getitem__(self, key):
         if type(key) is int:
             return self.getitem(key)
@@ -1241,7 +1241,7 @@ def asPattern(item):
     return Pattern(item)
 
 def pattern_depth(pat):
-    """ Returns the level of nested arrays """	
+    """ Returns the level of nested arrays """
     total = 1
     for item in pat:
         if isinstance(item, PGroup):

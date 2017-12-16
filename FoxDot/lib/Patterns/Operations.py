@@ -16,13 +16,13 @@ def DominantPattern(*patterns):
         if name in classes:
             break
     pat = patterns[classes.index(name)]
-    cls = pat.__class__    
-    return cls, pat    
+    cls = pat.__class__
+    return cls, pat
 
 class POperand:
 
     def __init__(self, func):
-        
+
         self.operate = func
 
     def __call__(self, A, B):

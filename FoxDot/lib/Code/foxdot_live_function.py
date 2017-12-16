@@ -35,7 +35,7 @@ def livefunction(f, dependency=None):
         _live_functions_dict[f.__name__].update(f, dependency)
     f = _live_functions_dict[f.__name__]
     # If the function is "live" call it
-    if f.live: f.__call__()    
+    if f.live: f.__call__()
     return f
 
 

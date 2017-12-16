@@ -25,7 +25,7 @@ class MenuBar(Menu):
         self.listening.set(False)
 
         # Set font
-        
+
         self.config(font="CodeFont")
 
         # File menu
@@ -106,9 +106,9 @@ class MenuBar(Menu):
         # Add to root
 
         self.visible = visible
-        
+
         if self.visible:
-            
+
             master.root.config(menu=self)
 
     def toggle(self):

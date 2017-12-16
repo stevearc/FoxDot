@@ -18,7 +18,7 @@ class PGroupPrime(PGroup):
         return delay
 
 class PGroupStar(PGroupPrime):
-    """ Stutters the values over the length of and event's 'dur' """    
+    """ Stutters the values over the length of and event's 'dur' """
     bracket_style="*()"
     def string(self):
         """ Used for SamplePlayerStrings """
@@ -37,7 +37,7 @@ class PGroupPow(PGroupPrime):
     """ Stutters a shuffled version the values over the length of and event's 'dur' """
     bracket_style="**()"
     def calculate_time(self, dur):
-        return PGroupPrime.calculate_time(self, dur).shuffle()    
+        return PGroupPrime.calculate_time(self, dur).shuffle()
 
 class PGroupDiv(PGroupPrime):
     """ Stutter every other request """
@@ -114,7 +114,7 @@ class PGroupXor(PGroupPrime):
     def set_delay(self, value):
         self.delay = value
         return self
-    
+
     def calculate_step(self, dur):
         return self.delay
 
@@ -149,7 +149,7 @@ def offlayer(self, method, *args, **kwargs):
     """ Zips a pattern with a modified version of itself. Method argument
         can be a function that takes this pattern as its first argument,
         or the name of a Pattern method as a string. """
-    
+
     if callable(method):
         func = method
         args = [self.data] + list(args)
@@ -160,7 +160,7 @@ def offlayer(self, method, *args, **kwargs):
     delay = kwargs.get("dur", 0.5)
 
     return self.zip(func(*args, **kwargs), dtype=PGroupXor(0, value).set_delay(delay))
-    
+
 @PatternMethod
 def amen(self, size=2):
     """ Merges and laces the first and last two items such that a

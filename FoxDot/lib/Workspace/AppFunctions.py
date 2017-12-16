@@ -40,7 +40,7 @@ def at_function(index, string):
 
 def in_brackets(index, string):
     """ Returns true if index is between a pair of brackets (could be non closing) """
-    
+
     left_b = list("({[")
     right_b = list(")}]")
 
@@ -106,9 +106,9 @@ def function(text):
         return
 
     tokens = tokens[:-1]
-    
+
     for b in left_b + right_b:
-        
+
         tokens = tokens.replace(b," ")
 
     tokens = tokens.split()

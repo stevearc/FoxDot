@@ -31,7 +31,7 @@ class NumberKey(object):
         elif not isinstance(value, metaPattern):
             value = Pattern(value)
         return value
-    
+
     def __add__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -51,7 +51,7 @@ class NumberKey(object):
         new = self.child(other)
         new.calculate = Add
         return new
-    
+
     def __sub__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -61,7 +61,7 @@ class NumberKey(object):
         new = self.child(other)
         new.calculate = rSub
         return new
-    
+
     def __rsub__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -71,7 +71,7 @@ class NumberKey(object):
         new = self.child(other)
         new.calculate = Sub
         return new
-    
+
     def __mul__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -91,7 +91,7 @@ class NumberKey(object):
         new = self.child(other)
         new.calculate = Mul
         return new
-    
+
     def __truediv__(self, other):
         if isinstance(other, (list, tuple)):
             other = self.convert_to_pattern(other)
@@ -129,7 +129,7 @@ class NumberKey(object):
         new = self.child(other)
         new.calculate = FloorDiv
         return new
-    
+
     def __mod__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -139,7 +139,7 @@ class NumberKey(object):
         new = self.child(other)
         new.calculate = rMod
         return new
-    
+
     def __rmod__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -149,7 +149,7 @@ class NumberKey(object):
         new = self.child(other)
         new.calculate = Mod
         return new
-    
+
     def __pow__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -159,7 +159,7 @@ class NumberKey(object):
         new = self.child(other)
         new.calculate = rPow
         return new
-    
+
     def __rpow__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -169,7 +169,7 @@ class NumberKey(object):
         new = self.child(other)
         new.calculate = Pow
         return new
-    
+
     def __xor__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -179,7 +179,7 @@ class NumberKey(object):
         new = self.child(other)
         new.calculate = rPow
         return new
-    
+
     def __rxor__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -199,7 +199,7 @@ class NumberKey(object):
         new = self.child(other)
         new.calculate = rDiv
         return new
-    
+
     def __rtruediv__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -220,7 +220,7 @@ class NumberKey(object):
         new = self.child(other)
         new.calculate = lambda a, b: b.eq(a) if isinstance(b, metaPattern) else int(a == b)
         return new
-    
+
     def __ne__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -230,7 +230,7 @@ class NumberKey(object):
         new = self.child(other)
         new.calculate = lambda a, b: b.ne(a) if isinstance(b, metaPattern) else int(a != b)
         return new
-    
+
     def __gt__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -246,7 +246,7 @@ class NumberKey(object):
         new = self.child(other)
         new.calculate = compare
         return new
-    
+
     def __lt__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -262,7 +262,7 @@ class NumberKey(object):
                 return int(value)
         new.calculate = compare
         return new
-    
+
     def __ge__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -278,7 +278,7 @@ class NumberKey(object):
                 return int(value)
         new.calculate = compare
         return new
-    
+
     def __le__(self, other):
         """ If operating with a pattern, return a pattern of values """
         if isinstance(other, (list, tuple)):
@@ -360,7 +360,7 @@ class NumberKey(object):
 
             If the value is callable, then it is called on this player key when the key
             is satisfied:
-            
+
             ```
             p1 >> piano(p2.degree.map({lambda x: x >= 4: lambda x: x + (0,2)}))
             ```
@@ -390,9 +390,9 @@ class NumberKey(object):
                 value = 0
             return value
 
-        new = self.child(0)        
+        new = self.child(0)
         new.calculate = mapping_function
-        return new        
+        return new
 
     def get_min(self):
         new = self.child(0)
@@ -419,9 +419,9 @@ class NumberKey(object):
         new = self.child(0)
         new.calculate = lambda a, b: func(b)
         return new
-    
+
     # Values
-    
+
     def __nonzero__(self):
         return self.__bool__()
     def __bool__(self):
@@ -436,7 +436,7 @@ class NumberKey(object):
         return repr(self.now())
     def __len__(self):
         return len(self.now())
-    
+
     def __iter__(self):
         try:
             for item in self.now():
@@ -446,16 +446,16 @@ class NumberKey(object):
 
     def child(self, other):
         return NumberKey(self.value, other)
-    
+
     def now(self, other=None):
         """ Returns the current value in the Key by calling the parent """
 
         # If we have p1.degree + 2 then self.value is 2 and self.other is p1.degree
-        
+
         if other is None:
-            
+
             if isinstance(self.other, (NumberKey, TimeVar)):
-                
+
                 other = self.other.now()
 
             else:
@@ -476,7 +476,7 @@ class PlayerKey(NumberKey):
     def __init__(self, value=None, reference=None, parent=None, attr=None):
 
         NumberKey.__init__(self, value, reference)
-        
+
         # Reference to the Player object that is using this
         self.parent  = parent # is the player
         self.key     = attr
@@ -497,7 +497,7 @@ class PlayerKey(NumberKey):
         self.value = value
         self.last_updated = time
         return
-    
+
     def update(self, value, time):
         """ Updates the contents of the PlayerKey *if* the time value is different to self.last_updated.
             If they are the same, the the contents become a PGroup of the two values """
@@ -514,12 +514,12 @@ class PlayerKey(NumberKey):
         return
 
     def update_pattern(self):
-        self.pattern[:] = asStream(self.parent.attr[self.key])               
+        self.pattern[:] = asStream(self.parent.attr[self.key])
         return
 
     def child(self, other):
         return PlayerKey(other, self, self.parent, self.key)
-    
+
 class AccompanyKey(NumberKey):
     """ Like PlayerKey except it returns """
     def __init__(self, other, rel=[0,2,4], debug=False):
@@ -549,10 +549,10 @@ class AccompanyKey(NumberKey):
         else:
 
             old = self.acmp_value
-            
+
             A = new % self.scale_size
             B = old % self.scale_size
-            
+
             # Order in "closeness" to our current value
             shifts = sorted(self.data, key=lambda N: abs(B - (A + N)))
 

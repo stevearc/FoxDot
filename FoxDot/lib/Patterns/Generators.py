@@ -60,7 +60,7 @@ class PRand(GeneratorPattern):
 
     def choose(self):
         return self.data[self.choice(range(self.MAX_SIZE))]
-            
+
     def func(self, index):
         if self.choosing:
             # value = self.choice(self.data)
@@ -78,7 +78,7 @@ class PxRand(PRand):
         value = PRand.func(self, index)
         while value == self.last_value:
             value = PRand.func(self, index)
-        self.last_value = value                
+        self.last_value = value
         return self.last_value
 
 class PwRand(GeneratorPattern):
@@ -96,14 +96,14 @@ class PwRand(GeneratorPattern):
 
     def choose(self):
         return self.values[self.choice(range(self.MAX_SIZE))]
-        
+
     def func(self, index):
         return self.choose()
 
 class PChain(GeneratorPattern):
     def __init__(self, mapping, **kwargs):
         GeneratorPattern.__init__(self, **kwargs)
-        
+
         self.args = (mapping,)
 
         self.last_value = 0
@@ -115,7 +115,7 @@ class PChain(GeneratorPattern):
             if i == 0:
                 self.last_value = key
                 i += 1
-                
+
     def func(self, index):
         self.last_value = self.choice(self.mapping[self.last_value])
         return self.last_value
@@ -128,7 +128,7 @@ class PTree(GeneratorPattern):
     """
     def __init__(self, n=0, f=lambda x: (x + 1, x - 1), choose=lambda x: random.choice(x), **kwargs):
         GeneratorPattern.__init__(self, **kwargs)
-        
+
         self.args=(n, f, choose)
 
         self.f  = f
@@ -145,10 +145,10 @@ class PWalk(GeneratorPattern):
         GeneratorPattern.__init__(self, **kwargs)
 
         self.args = (max, step, start)
-        
+
         self.max   = abs(max)
         self.min   = self.max * -1
-        
+
         self.step  = asStream(step).abs()
         self.start = start
 
@@ -169,7 +169,7 @@ class PWalk(GeneratorPattern):
             else:
                 f = self.choice(self.directions)
             self.last_value = f(self.last_value, self.step.choose())
-        return self.last_value   
+        return self.last_value
 
 class PWhite(GeneratorPattern):
     ''' Returns random floating point values between 'lo' and 'hi' '''

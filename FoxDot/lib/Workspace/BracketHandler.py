@@ -4,7 +4,7 @@ try:
     from Tkinter import *
 except ImportError:
     from tkinter import *
-    
+
 from .Format import *
 from .AppFunctions import *
 
@@ -14,7 +14,7 @@ class BracketHandler:
     def __init__(self, master):
 
         self.root = master
-        
+
         self.text = master.text
 
         self.inbrackets = False
@@ -60,12 +60,12 @@ class BracketHandler:
                 self.text.tag_remove(SEL, "1.0", END)
 
                 ret = "break"
-                
+
             except:
-                
+
                 pass
 
-            # B. If next character is a whitespace or a right bracket add a closing bracket as well. 
+            # B. If next character is a whitespace or a right bracket add a closing bracket as well.
 
             if next_char in whitespace + self.right_brackets_only:
 
@@ -105,7 +105,7 @@ class BracketHandler:
 
 
             # Update line colours
-        
+
             self.root.colour_line(line)
 
         # 2. Type right bracket
@@ -150,14 +150,14 @@ class BracketHandler:
                         adding_bracket = True
 
                 if index(new_line, new_col) == self.text.index(index(new_line, "end")):
-                    
+
                     new_line += 1
                     new_col   = 0
 
                 else:
 
                     new_col += 1
-                
+
             if not adding_bracket:
 
                 loc = index(line, column+1)
@@ -169,7 +169,7 @@ class BracketHandler:
             ret = "break"
 
             # Update line colours
-            
+
             self.root.colour_line(line)
 
             # Highlight brackets
@@ -198,7 +198,7 @@ class BracketHandler:
     def find_starting_bracket(self, line, column, bracket_style, offset = 0):
         """ Finds the opening bracket to the closing bracket at line, column co-ords.
             Returns None if not found. """
-        
+
         line_length = column - 1
         used_br = offset
 

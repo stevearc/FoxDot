@@ -44,7 +44,7 @@ def midi(scale, octave, degree, root=0, stepsPerOctave=12):
     octave = float(octave)
     degree = float(degree)
     root   = float(root)
-    
+
     # Floor val
     lo = int(math.floor(degree))
     hi = lo + 1
@@ -137,7 +137,7 @@ class MidiIn:
         """ Closes the active port """
         self.device.close_port()
         return
-                
+
 from .SCLang import SynthDefProxy
 
 class MidiOut(SynthDefProxy):
@@ -156,8 +156,3 @@ class rtMidiNotFound(Exception):
 if __name__ == "__main__":
 
     a = MidiIn()
-
-    
-
-
-        

@@ -24,7 +24,7 @@ class Config:
 
             # Use .ico file by default
             self.root.iconbitmap(FOXDOT_ICON)
-            
+
         except:
 
             # Use .gif if necessary
@@ -51,7 +51,7 @@ class Config:
             self.text = f.read()
 
         self.textbox.insert(INSERT, self.text)
-        
+
     def start(self):
         self.root.mainloop()
 
@@ -63,4 +63,3 @@ class Config:
         self.root.destroy()
         tkMessageBox.showwarning(title="Just a heads up", message="A restart of FoxDot is required for the changes to take effect")
         return
-

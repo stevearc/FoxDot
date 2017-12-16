@@ -12,7 +12,7 @@ try:
 except ImportError:
 
     TypeType = type
-    
+
 from ..Utils import modi
 
 # Player RegEx
@@ -30,11 +30,11 @@ class LiveObject(object):
 
     foxdot_object = True
     isAlive = True
-    
+
     metro = None
     step  = None
     n     = 0
-    
+
     def kill(self):
         self.isAlive = False
         return self
@@ -48,7 +48,7 @@ class LiveObject(object):
     FoxCode
     =======
     Handles the execution of FoxDot code
-    
+
 """
 
 class CodeString:
@@ -74,7 +74,7 @@ else:
         """ Removes non-ascii characters from a string """
         string = string.replace(u"\u03BB", "lambda")
         return string.encode("ascii", "replace")
-        
+
 class FoxDotCode:
     namespace={}
     player_line_numbers={}
@@ -83,7 +83,7 @@ class FoxDotCode:
     def _compile(string):
         ''' Returns the bytecode for  '''
         return compile(str(CodeString(string)), "FoxDot", "exec")
-                 
+
     def __call__(self, code, verbose=True):
         """ Takes a string of FoxDot code and executes as Python """
 
@@ -127,7 +127,7 @@ class FoxDotCode:
             match = re_player.match(line)
             line_changed = False
 
-            if match is not None:                
+            if match is not None:
 
                 whitespace = len(match.group(1))
                 player     = match.group(2)
@@ -147,11 +147,11 @@ class FoxDotCode:
                     update.append("{}.whitespace  = {}".format(player, whitespace))
 
         # Execute updates if necessary
-    
+
         if len(update) > 0:
 
             self.__call__("\n".join(update), verbose = False)
-                
+
         return
 
 execute = FoxDotCode()

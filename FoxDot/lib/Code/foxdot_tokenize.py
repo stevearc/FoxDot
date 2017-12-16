@@ -30,7 +30,7 @@
 ##    thisline  = 0
 ##    compiling = False
 ##    justcompiled = False
-##    
+##
 ##    expr      = False # If we have defined the expression
 ##    do        = False # If we have defined the do method
 ##    elsedo    = False # If we have defined the elsedo method
@@ -40,16 +40,16 @@
 ##
 ##    # Iterate through all of the tokens in a file
 ##    for type, name, start, end, line in tokenize.generate_tokens(readline):
-##        
+##
 ##        if compiling:
-##                    
+##
 ##            if start[0] == startline and not expr:
 ##
 ##              # Get the rest of the statement
 ##
 ##              tokens.insert(-1, (tokenize.STRING,
 ##                                 line.strip().replace('when', '').replace(':','')))
-##              
+##
 ##              tokens.append((tokenize.OP, '.'))
 ##              tokens.append((tokenize.NAME, 'do'))
 ##              tokens.append((tokenize.OP, '('))
@@ -129,7 +129,7 @@
 ##                tokens.append((tokenize.OP, ')'))
 ##
 ##                compiling = True
-##                
+##
 ##                thisline = startline = start[0]
 ##
 ##            else:

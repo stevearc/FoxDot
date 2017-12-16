@@ -2,7 +2,7 @@
     compare_functions.py(funcA, funcB):
 
         returns True if the functions are identical
-    
+
 """
 
 from __future__ import absolute_import, division, print_function
@@ -18,7 +18,7 @@ def func_cmp(funcA, funcB):
     B_bytecode  = codeB.co_code
     B_constants = codeB.co_consts
     B_variables = codeB.co_names
-    
+
     return all([A_bytecode == B_bytecode,
                 A_constants == B_constants,
                 A_variables == B_variables])

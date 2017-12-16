@@ -45,4 +45,3 @@ d1 >> dirt([0,4,2,1], dur=1/2, hpf=linvar([0,4000],8), hpr=P[1,1,0.3].stretch(8)
 d1.stop()
 
 # Try playing around with other effects and see what crazy sounds you can make!
-

@@ -11,7 +11,7 @@
     ```python
     # Example. Reverb effect "title" is `room` and attribute is `mix`, which
     # defaults to 0.25. The following adds a reverb effect
-    
+
     p1 >> pads(room=0.5)
 
     # This still adds the effect, but a mix of 0 doesn't actually do anything
@@ -24,7 +24,7 @@
     ```
 
     Other effects are outlined below:
-    
+
     *High Pass Filter* - Title keyword: `hpf`, Attribute keyword(s): `hpr`
     Only frequences **above** the value of `hpf` are kept in the final signal. Use `hpr` to set the resonance (usually a value between 0 and 1)
 
@@ -52,7 +52,7 @@
     *Panning* - Title keyword: `pan`, Attribute keyword(s):
     Panning, where -1 is far left, 1 is far right (defaults to 0)
 
-    *Vibrato* - Title keyword: `vib`, Attribute keyword(s): 
+    *Vibrato* - Title keyword: `vib`, Attribute keyword(s):
     Vibrato (defaults to 0)
 
     Undocumented: Spin, Shape, Formant, BandPassFilter, Echo
@@ -83,11 +83,11 @@ class Effect:
 
         self.input     = "osc = In.{}(bus, {});\n".format(self.suffix, self.channels)
         self.output    = "ReplaceOut.{}".format(self.suffix)
-        
+
     @classmethod
     def set_server(cls, server):
         cls.server = server
-    
+
     def __repr__(self):
         return "<Fx '{}' -- args: {}>".format(self.synthdef, ", ".join(self.args))
 
@@ -107,7 +107,7 @@ class Effect:
 
     def doc(self, string):
         """ Set a docstring for the effects"""
-        return 
+        return
 
     def list_effects(self):
         s = ""
@@ -131,7 +131,7 @@ class Effect:
 class In(Effect):
     def __init__(self):
         Effect.__init__(self, 'startSound', 'startSound')
-        self.save()      
+        self.save()
     def __str__(self):
         s  = "SynthDef.new(\startSound,\n"
         s += "{ arg bus, rate=1, sus; var osc;\n"
@@ -187,11 +187,11 @@ class EffectManager(dict):
                 self.all_kw.append(arg)
 
             # Store the default value
-            
+
             self.defaults[arg] = args[arg]
 
         return self[foxdot_arg_name]
-    
+
     def kwargs(self):
         """ Returns the title keywords for each effect """
         return tuple(self.kw)
@@ -265,12 +265,12 @@ fx.add("bpf = LFNoise1.kr(bpnoise).exprange(bpf * 0.5, bpf * 2)")
 fx.add("bpr = LFNoise1.kr(bpnoise).exprange(bpr * 0.5, bpr * 2)")
 fx.add("osc = BPF.ar(osc, bpf, bpr)")
 fx.save()
-       
+
 if SC3_PLUGINS:
 
     fx = FxList.new('bits', 'bitcrush', {'bits': 0, 'sus': 1, 'amp': 1, 'crush': 1}, order=1)
     fx.add("osc = Decimator.ar(osc, rate: 44100/crush, bits: bits)")
-    fx.add("osc = osc * Line.ar(amp * 0.85, 0.0001, sus * 2)") 
+    fx.add("osc = osc * Line.ar(amp * 0.85, 0.0001, sus * 2)")
     fx.save()
 
     fx = FxList.new('dist', 'distortion', {'dist': 0}, order=1)
@@ -279,7 +279,7 @@ if SC3_PLUGINS:
 
 # Envelope
 
-# Post envelope effects    
+# Post envelope effects
 
 fx = FxList.new('chop', 'chop', {'chop': 0, 'sus': 1}, order=2)
 fx.add("osc = osc * LFPulse.ar(chop / sus, add: 0.1)")

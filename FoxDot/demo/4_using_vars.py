@@ -10,13 +10,13 @@ a = var([0,4,5,3], 4)
 
 print(a)
 
-# Use 'var' with your Player objects to create chord progressions. 
+# Use 'var' with your Player objects to create chord progressions.
 
 b1 >> bass(a, dur=PDur(3,8))
 
 p1 >> pads(a + (0,2), dur=PDur(7,16))
 
-# You can add a 'var' to a Player object or a var. 
+# You can add a 'var' to a Player object or a var.
 
 b1 >> bass(a, dur=PDur(3,8)) + var([0,1],[3,1])
 

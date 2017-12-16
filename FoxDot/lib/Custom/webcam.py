@@ -50,7 +50,7 @@ class connect:
         # Extract motion data
 
         m = self.motion()
-        
+
         motion = np.count_nonzero(m)
 
         # 1. Amount of motion = shorter notes
@@ -92,7 +92,7 @@ class connect:
                                              "sus" , 4,
                                              "amp" , self.amp,
                                              "pan" , p ])
-        
+
         return
 
     def motion(self, *args):
@@ -103,7 +103,7 @@ class connect:
             w, h, rgb = dim
         else:
             w, h = dim
-            
+
         motion_img = np.zeros((w,h), dtype=np.uint8)
 
         A = cv2.cvtColor(self.queue[0], cv2.COLOR_BGR2GRAY)
@@ -119,7 +119,7 @@ class connect:
             A = B
 
         r, motion_img = cv2.threshold(motion_img, 200, 255, cv2.THRESH_BINARY)
-            
+
         return motion_img
 
     def start(self):
@@ -135,7 +135,7 @@ class connect:
         while True:
 
             # Read from webcam
-            
+
             ret, self.img = self.cap.read()
 
             # Resize
@@ -145,12 +145,12 @@ class connect:
 
             # Store the last few frames
 
-            self.queue = self.queue[(self.q_size * -1):] + [self.img]    
+            self.queue = self.queue[(self.q_size * -1):] + [self.img]
 
             #: Process the image
 
             try:
-            
+
                 self.img = self.display(self.img)
 
             except Exception as e:
@@ -160,7 +160,7 @@ class connect:
             # Show the image
 
             if ret: cv2.imshow('FoxDot', self.img)
-            
+
             if cv2.waitKey(1000 / self.fps) & 0xFF == ord('q'):
                 break
 

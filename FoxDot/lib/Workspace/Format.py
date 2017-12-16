@@ -107,10 +107,10 @@ def userdefined(line):
     if match:
 
         return match.group()
-    
+
 
 # Use our regex to read patterns.py and add all the functions to key_types
-    
+
 from ..Patterns import Main, Sequences, Generators
 from ..SCLang import SCLang
 

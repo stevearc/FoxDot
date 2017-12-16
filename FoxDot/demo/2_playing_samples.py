@@ -48,6 +48,3 @@ d1 >> play("(x[--])xu[--]", sample=2)
 d1 >> play("(x[--])xu[--]", sample=[1,2,3])
 
 Clock.clear()
-
-
-

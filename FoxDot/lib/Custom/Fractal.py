@@ -29,7 +29,7 @@ class Fractal:
         self.y = [40]
 
         self.r = 0.5
-        
+
 
     def __call__(self, player):
         """ Takes information  about the current state of the player
@@ -37,7 +37,7 @@ class Fractal:
         # Add new player
 
         if player.id not in self.players:
-            
+
             self.players.append(player.id)
 
         p = randint(0, self.len-1)
@@ -63,9 +63,3 @@ class Fractal:
         self.canvas.create_oval(x - 3, y - 3, x + 3, y + 3, fill=fill, outline=fill)
 
         return
-
-
-
-
-
-        

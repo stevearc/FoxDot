@@ -11,7 +11,7 @@ You can also use this shorthand to create a pattern:
 
     myPattern = P[0,1,2,3]
 
-When using this method of instantiating a `Pattern` you can use Python slices to generate a 
+When using this method of instantiating a `Pattern` you can use Python slices to generate a
 range of numbers. The following creates the pattern `P[0,1,2,3,4,6,8,10]`:
 
     myPattern = P[0:4,4:12:2]
@@ -48,7 +48,7 @@ of `PGroups` is returned instead, alternating the values in the slot that was a 
     P[P(0, 1, 2), P(0, 1, 3), P(0, 1, 4)]
 
 Similar to `numpy` arrays, arithmetic operations are performed on all elements of a `Pattern`,
-including nested `Patterns` and `PGroups`. If I use a `list` or `Pattern` of values in an operation 
+including nested `Patterns` and `PGroups`. If I use a `list` or `Pattern` of values in an operation
 (we will use  addition as an example) then each value is added in sequence until all values are added
 together:
 

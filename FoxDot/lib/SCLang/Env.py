@@ -9,7 +9,7 @@ class EnvGen(instance):
         return str( cls("EnvGen").ar(instance(self.__attr__()), doneAction=self.doneAction))
     def __attr__(self):
         """ Converts the attr dict to SCLang arguments """
-        args = ",".join(["{}: {}".format(str(key), str(value)) for key, value in self.attr.items()])        
+        args = ",".join(["{}: {}".format(str(key), str(value)) for key, value in self.attr.items()])
         return self.value + "(" + args + ")"
 
 class env(EnvGen):

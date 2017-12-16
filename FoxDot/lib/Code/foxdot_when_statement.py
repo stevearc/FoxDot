@@ -88,13 +88,13 @@ class _whenStatement:
             run the appropriate response code '''
         if self.expr():
             if not self.do_switch:
-                
+
                 # Execute the values
 ##                for action in self.action:
 ##                    exec(compile(action, "FoxDot", "exec"), self.namespace)
 
                 self.action()
-                    
+
                 self.toggle_live_functions(True)
                 self.do_switch = True
                 self.elsedo_switch = False
@@ -102,7 +102,7 @@ class _whenStatement:
             if not self.elsedo_switch:
 
                 self.notaction()
-                
+
                 # Execute the values
 ##                for action in self.notaction:
 ##                    exec(compile(action, "FoxDot", "exec"), self.namespace)
@@ -112,7 +112,7 @@ class _whenStatement:
                 self.elsedo_switch = True
 
     def toggle_live_functions(self, switch):
-        """ If the action functions are @livefunctions, turn them on/off """    
+        """ If the action functions are @livefunctions, turn them on/off """
         try:
             self.action.live = switch
         except:
@@ -126,19 +126,19 @@ class _whenStatement:
     def when(self, func):
         self.expr = func
         return self
-                
+
     def then(self, func):
         ''' Set the instructions for when the test expression is True. Should
             be a list of strings. '''
         self.action = func
         return self
-    
+
     def elsedo(self, func):
         ''' Set the instructions for when the test expression is False. Should
             be a list of strings. '''
         self.notaction = func
         return self
-    
+
     def stop(self):
         self.reset()
         return self
@@ -151,11 +151,11 @@ class _whenStatement:
 class _whenLibrary:
     """  Used to store 'when statements'. Is accessed through the `__when__` object.
     """
-    
+
     def __init__(self):
         self.library = {}
         self.editing = None
-        
+
     def start_thread(self):
         self.thread = Thread(target=self.run)
         self.thread.daemon = True
@@ -175,7 +175,7 @@ class _whenLibrary:
         """ Continual loop evaluating when_statements
         """
         while len(self.library) > 0:
-            
+
             for name, expression in self.library.items():
 
                 if expression.remove_me == True:
@@ -189,15 +189,15 @@ class _whenLibrary:
             sleep(0.01)
 
         return
-        
+
     def __call__(self, name, **kwargs):
         """ Calling when() with no arguments will evaluate all expressions
             stored in self.library. Calling with func as a valid function
             will see if the function is in self.library and add it if not,
-            or update the 
+            or update the
 
-        """   
-            
+        """
+
         if name in self.library:
 
             return self.library[name]
@@ -220,7 +220,7 @@ class _whenLibrary:
 
     def a(self, expr):
         if self.editing is not None:
-            self.editing.when(expr)            
+            self.editing.when(expr)
         return None
     def b(self, expr):
         if self.editing is not None:

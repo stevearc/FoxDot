@@ -20,7 +20,7 @@ class Bang:
         self.func = kwargs.get("func", None)
 
         # Argument is by default, the  player
-        
+
         self.args = kwargs.get("args", (player,))
 
         # User can supply a function to call on bang
@@ -40,7 +40,7 @@ class Bang:
             # Get visible portion of the text window
 
             try:
-            
+
                 a = self.widget.text.index("@0,0")
                 b = self.widget.text.index("@0,%d" % self.widget.text.winfo_height())
 
@@ -53,12 +53,12 @@ class Bang:
             # Only update visuals if the line is visible
 
             if a <= player.line_number <= b:
-                
+
                 row = player.line_number
                 col = player.whitespace
                 env   = player.envelope
                 event = player.event
-                
+
                 duration = event['sus']
 
                 self.id = "{}_bang".format(player.id)
@@ -84,4 +84,3 @@ class Bang:
     def remove(self):
         self.widget.addTask(target=self.widget.text.tag_delete, args=(self.id,))
         return
-      

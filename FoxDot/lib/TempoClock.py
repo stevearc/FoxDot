@@ -2,17 +2,17 @@
     Clock management for scheduling notes and functions. Anything 'callable', such as a function
     or instance with a `__call__` method, can be scheduled. An instance of `TempoClock` is created
     when FoxDot started up called `Clock`, which is used by `Player` instances to schedule musical
-    events. 
+    events.
 
     The `TempoClock` is also responsible for sending the osc messages to SuperCollider. It contains
     a queue of event blocks, instances of the `QueueBlock` class, which themselves contain queue
     items, instances of the `QueueObj` class, which themseles contain the actual object or function
-    to be called. The `TempoClock` is continually running and checks if any queue block should 
+    to be called. The `TempoClock` is continually running and checks if any queue block should
     be activated. A queue block has a "beat" value for which its contents should be activated. To make
     sure that events happen on time, the `TempoClock` will begin processing the contents 0.25
-    seconds before it is *actually* meant to happen in case there is a large amount to process.  When 
+    seconds before it is *actually* meant to happen in case there is a large amount to process.  When
     a queue block is activated, a new thread is created to process all of the callable objects it
-    contains. If it calls a `Player` object, the queue block keeps track of the OSC messages generated 
+    contains. If it calls a `Player` object, the queue block keeps track of the OSC messages generated
     until all `Player` objects in the block have been called. At this point the thread is told to
     sleep until the remainder of the 0.25 seconds has passed. This value is stored in `Clock.latency`
     and is adjustable. If you find that there is a noticeable jitter between events, i.e. irregular
@@ -24,7 +24,7 @@
     bound to the shortcut key, `Ctrl+.`. You can schedule non-player objects in the clock by
     using `Clock.schedule(func, beat, args, kwargs)`. By default `beat` is set to the next
     bar in the clock, but you use `Clock.now() + n` or `Clock.next_bar() + n` to schedule a function
-    in the future at a specific time. 
+    in the future at a specific time.
 
     To change the tempo of the clock, just set the bpm attribute using `Clock.bpm=val`. The change
     in tempo will occur at the start of the next bar so be careful if you schedule this action within
@@ -84,7 +84,7 @@ class TempoClock(object):
         self.dtype=Fraction
 
         # Store time as a rational number
-        
+
         self.time       = self.dtype(0) # Seconds elsapsed
         self.beat       = self.dtype(0) # Beats elapsed
         self.start_time = self.dtype(time()) # could set to 0?
@@ -108,7 +108,7 @@ class TempoClock(object):
         # Create the queue
         self.queue = Queue(self)
         self.current_block = None
-        
+
         # Midi Clock In
         self.midi_clock = None
 
@@ -179,10 +179,10 @@ class TempoClock(object):
             # Notify listening clients -- future
             if self.tempo_client is not None:
                 self.tempo_client.update_tempo(value)
-            
+
             if self.tempo_server is not None:
                 self.tempo_server.update_tempo(value)
-                
+
         else:
             self.__dict__[attr] = value
         return
@@ -302,7 +302,7 @@ class TempoClock(object):
     def osc_message_time(self):
         """ Returns the true time that an osc message should be run i.e. now + latency """
         return time() + self.latency
-        
+
     def start(self):
         """ Starts the clock thread """
         main = threading.Thread(target=self.run)
@@ -349,7 +349,7 @@ class TempoClock(object):
 
     def run(self):
         """ Main loop """
-        
+
         self.ticking = True
 
         while self.ticking:
@@ -479,8 +479,8 @@ class TempoClock(object):
 
             if hasattr(item, 'stop'):
 
-                item.stop()             
-        
+                item.stop()
+
         self.playing = []
         self.ticking = False
 
@@ -500,7 +500,7 @@ class Queue(object):
         """ Adds a callable object to the queue at a specified beat, args and kwargs for the
             callable object must be in a list and dict.
         """
-        
+
         # item must be callable to be schedule, so check args and kwargs are appropriate for it
 
         try:
@@ -513,7 +513,7 @@ class Queue(object):
 
         # If the item can't take arbitrary keywords, check any kwargs are valid
 
-        if function.keywords is None: 
+        if function.keywords is None:
 
             for key in list(kwargs.keys()):
 
@@ -536,14 +536,14 @@ class Queue(object):
             # out its position in the queue
 
             # need to be careful in case self.data changes size
-            
+
             for block in self.data:
 
                 # If another event is happening at the same time, schedule together
 
                 if beat == block.beat:
 
-                    block.add(item, args, kwargs)                    
+                    block.add(item, args, kwargs)
 
                     break
 
@@ -592,7 +592,7 @@ class Queue(object):
     def get_server(self):
         """ Returns the `ServerManager` instanced used by this block's parent clock """
         return self.parent.server
-            
+
 from types import FunctionType
 class QueueBlock(object):
     priority_levels = [
@@ -601,7 +601,7 @@ class QueueBlock(object):
                         lambda x: isinstance(x, Player),     # Then players themselves
                         lambda x: True                       # And anything else
                       ]
-                       
+
     def __init__(self, parent, obj, t, args=(), kwargs={}):
 
         self.events         = [ [] for lvl in self.priority_levels ]
@@ -623,10 +623,10 @@ class QueueBlock(object):
     def start_server(self, serv):
         self.tempo_server = serv(self)
         return
-        
+
     def __repr__(self):
         return "{}: {}".format(self.beat, self.players())
-    
+
     def add(self, obj, args=(), kwargs={}):
         """ Adds a callable object to the QueueBlock """
 
@@ -651,7 +651,7 @@ class QueueBlock(object):
             if msg.address == "/foxdot_midi": # TODO -- dont hard code this
                 self.server.sclang.send(msg)
             else:
-                self.server.client.send(msg)        
+                self.server.client.send(msg)
         return
 
     def call(self, item, caller = None):
@@ -711,7 +711,7 @@ class QueueBlock(object):
 
     def objects(self):
         return [item.obj for level in self.events for item in level]
-        
+
 
 class QueueObj(object):
     """ Class representing each item in a `QueueBlock` instance """
@@ -742,7 +742,7 @@ class History(object):
 from . import Code
 
 class Wrapper(Code.LiveObject):
-    
+
     def __init__(self, metro, obj, dur, args=()):
         self.args  = asStream(args)
         self.obj   = obj
@@ -778,7 +778,7 @@ class SoloPlayer:
             return repr(self.data[0])
         else:
             return repr(self.data)
-        
+
     def add(self, player):
         if player not in self.data:
             self.data.append(player)

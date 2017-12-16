@@ -27,19 +27,19 @@ class ThreadedText(Text):
         if line_h is not None:
             self.height = int((self.winfo_height()-2) / line_h[3])
         return
-    
+
     def update(self):
         """ Recursively called method that monitors as
             queue of Tkinter tasks.
         """
         try:
-            
+
             while True:
 
                 task, args, kwargs = self.queue.get_nowait()
 
                 task(*args, **kwargs)
-                
+
                 self.update_idletasks()
 
         # Break when the queue is empty

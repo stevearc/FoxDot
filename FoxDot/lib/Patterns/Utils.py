@@ -60,5 +60,3 @@ def CalculateDelaysFromDur(durations):
             durs.append(item)
             dels.append(0)
     return durs, dels.rotate(-1)
-    
-        

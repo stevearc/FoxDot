@@ -9,7 +9,7 @@ class LineNumbers(Tk.Canvas):
     def __init__(self, master, *args, **kwargs):
         Tk.Canvas.__init__(self, *args, **kwargs)
         self.textwidget = master
-        
+
         self.redraw()
 
     def redraw(self, *args):
@@ -24,7 +24,7 @@ class LineNumbers(Tk.Canvas):
         self.create_line(w, 0, w, h, fill="gray")
 
         i = self.textwidget.index("@0,0")
-        
+
         while True:
 
             dline=self.textwidget.dlineinfo(i)

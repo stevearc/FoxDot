@@ -37,9 +37,9 @@ class Repeatable(object):
         except:
 
             pass
-        
+
         return self
-        
+
     def every(self, n, cmd, *args, **kwargs):
         """ Every n beats, call a method (defined as a string) on the
             object and use the args and kwargs. To call the method
@@ -58,7 +58,7 @@ class Repeatable(object):
             # If the method is not valid but *is* a valid Pattern method, that is called and reverted
 
             p1.every(4, 'palindrome')
-            
+
             ```
 
         """
@@ -173,7 +173,7 @@ class Repeatable(object):
         for method in list(self.repeat_events.keys()):
             self.never(method)
         return self
-            
+
 
     def never(self, method):
         try:
@@ -188,8 +188,8 @@ class MethodCall:
     """ Class to represent an object's method call that,
         when called, schedules itself in the future """
     def __init__(self, parent, method, n, cycle=None, args=(), kwargs={}):
-        
-        self.parent = parent  
+
+        self.parent = parent
         self.method = method
 
         self.cycle = cycle
@@ -197,7 +197,7 @@ class MethodCall:
 
         self.this_when = float(self.when[0])
         self.last_when = 0
-        
+
         self.i, self.next = self.count()
 
         self.args = args
@@ -223,7 +223,7 @@ class MethodCall:
         # How much time left to fit remainder in
 
         try:
-       
+
             acc = now - (now % total_dur)
 
         except ZeroDivisionError:
@@ -257,7 +257,7 @@ class MethodCall:
                     break
 
                 else:
-                    
+
                     acc += dur
                     n += 1
 
@@ -275,7 +275,7 @@ class MethodCall:
         self.last_when, self.this_when = self.this_when, float(self.when[self.i])
 
         if self.cycle:
-            
+
             self.next += (float(modi(self.cycle, self.i)) + (self.this_when - self.last_when))
 
         else:
@@ -322,5 +322,5 @@ class MethodCall:
             self.next = self.parent.metro.next_bar() + self.when[self.i]
 
         self.cycle = cycle
-        
+
         return self

@@ -81,7 +81,7 @@ def GET_TUTORIAL_FILES():
 from . import conf
 
 FOXDOT_CONFIG_FILE  = conf.filename
-    
+
 ADDRESS       = conf.ADDRESS
 PORT          = conf.PORT
 PORT2         = conf.PORT2

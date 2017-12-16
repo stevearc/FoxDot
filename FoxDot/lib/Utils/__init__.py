@@ -71,7 +71,7 @@ def EuclidsAlgorithm(n, k, lo=0, hi=1):
 def PulsesToDurations(data):
     """ Returns a list of durations based on pulses (1s) and blanks (0s).
         Data should be a list of [1,0] where 1 is a pulse. """
-    
+
     count, seq = 1, []
 
     for item in data[1:]:

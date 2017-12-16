@@ -21,4 +21,3 @@ class TextPrompt:
     def hide(self):
         self.label.place(x=9999, y=9999)
         return
-    
