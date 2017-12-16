@@ -1327,7 +1327,7 @@ class Player(Repeatable):
             if rate < 0:
                 pos += abs(rate) * sus
 
-            buf  = self.samples.getBufferFromSymbol(str(degree), sample).bufnum
+            buf  = self.samples.getBufferFromSymbol(str(degree), sample)
 
             message = {'buf': buf, 'pos': pos, 'sus': sus, 'rate': rate}
 
@@ -1585,8 +1585,8 @@ class Player(Repeatable):
             as there is a play1 and play2 SynthDef for playing audio files with
             one or two channels respectively. """
         if self.synthdef == SamplePlayer or self.synthdef == LoopPlayer:
-            numChannels = self.samples.getBuffer(buf).channels
-            if numChannels == 1:
+            info = self.samples.getBufferInfo(buf)
+            if info is None or info.channels == 1:
                 synthdef = "play1"
             else:
                 synthdef = "play2"

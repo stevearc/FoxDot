@@ -16,7 +16,6 @@ from __future__ import absolute_import, division, print_function
 
 import fnmatch
 import os
-import wave
 from contextlib import closing
 from itertools import chain
 from os.path import abspath, join, isabs, isfile, isdir, splitext
@@ -109,31 +108,6 @@ def symbolToDir(symbol):
         return None
 
 
-class Buffer(object):
-    def __init__(self, fn, number, channels=1):
-        self.fn = fn
-        self.bufnum   = int(number)
-        self.channels = channels
-
-    def __repr__(self):
-        return "<Buffer num {}>".format(self.bufnum)
-
-    def __int__(self):
-        return self.bufnum
-
-    @classmethod
-    def fromFile(cls, filename, number):
-        try:
-            with closing(wave.open(filename)) as snd:
-                numChannels = snd.getnchannels()
-        except wave.Error:
-            numChannels = 1
-        return cls(filename, number, numChannels)
-
-
-nil = Buffer('', 0)
-
-
 class BufferManager(object):
     def __init__(self, server=DefaultServer, paths=()):
         self._server = server
@@ -171,21 +145,18 @@ class BufferManager(object):
         """ Add a path to the search paths for samples """
         self._paths.append(abspath(path))
 
-    def free(self, filenameOrBuf):
+    def free(self, bufnum):
         """ Free a buffer. Accepts a filename or buffer number """
-        if isinstance(filenameOrBuf, int):
-            buf = self._buffers[filenameOrBuf]
-        else:
-            buf = self._fn_to_buf[filenameOrBuf]
-        del self._fn_to_buf[buf.fn]
-        self._buffers[buf.bufnum] = None
-        self._server.bufferFree(buf.bufnum)
+        if fn is not None:
+            del self._fn_to_buf[fn]
+            self._buffers[bufnum] = None
+            self._server.bufferFree(bufnum)
 
     def freeAll(self):
         """ Free all buffers """
         buffers = list(self._fn_to_buf.values())
-        for buf in buffers:
-            self.free(buf.bufnum)
+        for bufnum in buffers:
+            self.free(bufnum)
 
     def setMaxBuffers(self, max_buffers):
         """ Set the max buffers on the SC server """
@@ -204,27 +175,26 @@ class BufferManager(object):
     def getBufferFromSymbol(self, symbol, index=0):
         """ Get buffer information from a symbol """
         if symbol.isspace():
-            return nil
+            return 0
         dirname = symbolToDir(symbol)
         if dirname is None:
-            return nil
+            return 0
         samplepath = self._findSample(dirname, index)
         if samplepath is None:
-            return nil
+            return 0
         return self._allocateAndLoad(samplepath)
 
-    def getBuffer(self, bufnum):
-        """ Get buffer information from the buffer number """
-        return self._buffers[bufnum]
+    def getBufferInfo(self, bufnum):
+        """ Proxy to fetch buffer info from server """
+        return self._server.getBufferInfo(bufnum)
 
     def _allocateAndLoad(self, filename):
         """ Allocates and loads a buffer from a filename, with caching """
         if filename not in self._fn_to_buf:
             bufnum = self._getNextBufnum()
-            buf = Buffer.fromFile(filename, bufnum)
             self._server.bufferRead(filename, bufnum)
-            self._fn_to_buf[filename] = buf
-            self._buffers[bufnum] = buf
+            self._fn_to_buf[filename] = bufnum
+            self._buffers[bufnum] = filename
         return self._fn_to_buf[filename]
 
     def _getSoundFile(self, filename):
@@ -376,8 +346,7 @@ class BufferManager(object):
         if samplepath is None:
             return 0
         else:
-            buf = self._allocateAndLoad(samplepath)
-            return buf.bufnum
+            return self._allocateAndLoad(samplepath)
 
 
 def hasext(filename):
